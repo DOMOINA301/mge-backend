@@ -23,10 +23,27 @@ const app = express();
 
 /* ================= MIDDLEWARES ================= */
 
-// CORS pour React (Vite)
+// CORS pour React (Vite + Vercel)
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:5175',
+  'https://mge-parrainage.vercel.app'
+];
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "http://localhost:5174", "http://localhost:5175"],
+    origin: function (origin, callback) {
+      // Permettre les requêtes sans origine (comme les appels serveur à serveur)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.log('Origine bloquée par CORS:', origin);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true
   })
 );
